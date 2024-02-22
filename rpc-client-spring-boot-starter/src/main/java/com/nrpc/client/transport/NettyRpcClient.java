@@ -7,17 +7,18 @@ import com.nrpc.codec.RpcDecoder;
 import com.nrpc.codec.RpcEncoder;
 import com.nrpc.common.RpcRequest;
 import com.nrpc.common.RpcResponse;
+import com.nrpc.message.PingMessage;
 import com.nrpc.protocol.MessageHeader;
 import com.nrpc.protocol.MessageProtocol;
 import com.nrpc.protocol.ProtocolFrameDecoder;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.TimeUnit;
@@ -40,6 +41,19 @@ public class NettyRpcClient implements RpcClient {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new ProtocolFrameDecoder());
                         pipeline.addLast(CODEC_SHARABLE);
+                        // 3秒钟检查一次写事件 状态是：IdleState.WRITER_IDLE
+                        pipeline.addLast(new IdleStateHandler(0, 15, 0));
+                        pipeline.addLast(new ChannelDuplexHandler() {
+                            @Override
+                            public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+                                IdleStateEvent event = (IdleStateEvent) evt;
+                                if (event.state() == IdleState.WRITER_IDLE) {
+                                    // 心跳检查
+//                                        log.debug("15秒没有写操作，发送心跳");
+                                    ctx.writeAndFlush(new PingMessage());
+                                }
+                            }
+                        });
 //                        pipeline.addLast(new RpcEncoder<>());
 //                        // 协议解码
 //                        pipeline.addLast(new RpcDecoder());

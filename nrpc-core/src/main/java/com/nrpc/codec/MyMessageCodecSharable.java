@@ -35,7 +35,7 @@ public class MyMessageCodecSharable<T> extends MessageToMessageCodec<ByteBuf, Me
     +-----------------------------------------------------------------+
     | 魔数 4byte | 协议版本号 1byte | 序列化算法 1byte | 指令类型 1byte    |
     +-----------------------------------------------------------------+
-    | 请求序列 4byte | 填充数 1byte | 数据长度 4byte  |  消息 ID 32byte   |
+    | 请求序列 4byte | 状态 1byte | 数据长度 4byte  |  消息 ID 不定        |
     +-----------------------------------------------------------------+
     */
     @Override

@@ -6,13 +6,13 @@ import com.nrpc.codec.RpcEncoder;
 import com.nrpc.protocol.ProtocolFrameDecoder;
 import com.nrpc.server.handler.RpcRequestHandler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
@@ -44,6 +44,21 @@ public class NettyRpcServer implements RpcServer {
 //                            pipeline.addLast(new RpcEncoder<>());
 //                            // 协议解码
 //                            pipeline.addLast(new RpcDecoder());
+                            pipeline.addLast(new IdleStateHandler(20, 0, 0));
+                            // ChannelDuplexHandler 可以同时作为入站和出站处理器
+                            pipeline.addLast(new ChannelDuplexHandler() {
+                                // 用来触发特殊事件 IdleStateEvent
+                                @Override
+                                public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception{
+                                    IdleStateEvent event = (IdleStateEvent) evt;
+                                    // 触发了读空闲事件
+                                    if (event.state() == IdleState.READER_IDLE) {
+                                        log.debug("已经 8s 没有读到数据了");
+                                        // 关闭该客户端连接
+                                        ctx.channel().close();
+                                    }
+                                }
+                            });
                             pipeline.addLast(RPC_REQUEST_HANDLER);// rpc请求处理器
                         }
                     })
