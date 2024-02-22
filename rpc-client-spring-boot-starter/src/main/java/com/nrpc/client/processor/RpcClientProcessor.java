@@ -76,6 +76,7 @@ public class RpcClientProcessor implements BeanFactoryPostProcessor, Application
                                                 .getProxy(field.getType(), rpcAutowired.version(), discoveryService, properties));
                     }
                 });
+                System.err.println(beanClassName + " 类被代理了");
             }
         }
     }

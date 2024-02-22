@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  *
  */
 @Data
+@ConfigurationProperties("nrpc.client")
 public class RpcClientProperties {
 
     /**

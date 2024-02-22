@@ -71,7 +71,7 @@ public class RpcServerProvide implements BeanPostProcessor, CommandLineRunner {
                 serviceInfo.setVersion(annotation.version());
                 serviceInfo.setAppName(rpcServerProperties.getAppName());
                 serviceInfo.setServiceName(ServiceUtil.serviceKey(serviceName, version));
-
+                System.err.println("服务注册成功：" + serviceInfo);
                 registerService.register(serviceInfo);
             } catch (Exception e) {
                 log.error("服务注册出错:{}", e);

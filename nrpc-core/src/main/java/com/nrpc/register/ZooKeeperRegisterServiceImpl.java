@@ -22,6 +22,7 @@ public class ZooKeeperRegisterServiceImpl implements RegisterService{
             CuratorFramework client = CuratorFrameworkFactory
                     .newClient(address, new ExponentialBackoffRetry(BASE_SLEEP_TIME_MS, MAX_RETRIES));
             client.start();
+            System.err.println("ZooKeeper启动成功");
             /**
              * ServiceInfo.class：指定了服务实例的类型为 ServiceInfo。
              * client：指定了与 Zookeeper 通信的 CuratorFramework 客户端。
@@ -36,6 +37,7 @@ public class ZooKeeperRegisterServiceImpl implements RegisterService{
                     .basePath(ZK_BASE_PATH)
                     .build();
             this.serviceDiscovery.start();
+            System.err.println("serviceDiscovery start success");
         }catch (Exception e){
             log.error("serviceDiscovery start error :{}", e);
         }
@@ -49,7 +51,6 @@ public class ZooKeeperRegisterServiceImpl implements RegisterService{
                 .name(serviceInfo.getServiceName())// 服务名称
                 .payload(serviceInfo)
                 .build();
-
         serviceDiscovery.registerService(serviceInstance);
     }
 

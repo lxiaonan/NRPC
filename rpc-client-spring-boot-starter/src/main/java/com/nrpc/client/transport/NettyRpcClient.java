@@ -3,6 +3,8 @@ package com.nrpc.client.transport;
 import com.nrpc.client.cache.LocalRpcResponseCache;
 import com.nrpc.client.handler.RpcResponseHandler;
 import com.nrpc.codec.MyMessageCodecSharable;
+import com.nrpc.codec.RpcDecoder;
+import com.nrpc.codec.RpcEncoder;
 import com.nrpc.common.RpcRequest;
 import com.nrpc.common.RpcResponse;
 import com.nrpc.protocol.MessageHeader;
@@ -37,7 +39,10 @@ public class NettyRpcClient implements RpcClient {
                     protected void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new ProtocolFrameDecoder());
-                        pipeline.addLast(CODEC_SHARABLE);
+//                        pipeline.addLast(CODEC_SHARABLE);
+                        pipeline.addLast(new RpcEncoder<>());
+                        // 协议解码
+                        pipeline.addLast(new RpcDecoder());
                         pipeline.addLast(RPC_RESPONSE_HANDLER);
                     }
                 });
