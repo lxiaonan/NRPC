@@ -40,10 +40,10 @@ public class NettyRpcServer implements RpcServer {
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
                             pipeline.addLast(new ProtocolFrameDecoder());// 可变长消息解码器
-//                            pipeline.addLast(CODEC_SHARABLE);// 编解码器
-                            pipeline.addLast(new RpcEncoder<>());
-                            // 协议解码
-                            pipeline.addLast(new RpcDecoder());
+                            pipeline.addLast(CODEC_SHARABLE);// 编解码器
+//                            pipeline.addLast(new RpcEncoder<>());
+//                            // 协议解码
+//                            pipeline.addLast(new RpcDecoder());
                             pipeline.addLast(RPC_REQUEST_HANDLER);// rpc请求处理器
                         }
                     })
