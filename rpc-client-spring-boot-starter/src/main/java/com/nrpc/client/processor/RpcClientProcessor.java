@@ -3,6 +3,7 @@ package com.nrpc.client.processor;
 import com.nrpc.client.annotation.RpcAutowired;
 import com.nrpc.client.config.RpcClientProperties;
 import com.nrpc.client.proxy.ClientProxyFactory;
+import com.nrpc.client.transport.RpcClient;
 import com.nrpc.discovery.DiscoveryService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -34,11 +35,13 @@ public class RpcClientProcessor implements BeanFactoryPostProcessor, Application
     private RpcClientProperties properties;
 
     private ApplicationContext applicationContext;
+    private RpcClient rpcClient;
 
-    public RpcClientProcessor(ClientProxyFactory clientProxyFactory, DiscoveryService discoveryService, RpcClientProperties properties) {
+    public RpcClientProcessor(ClientProxyFactory clientProxyFactory, DiscoveryService discoveryService, RpcClientProperties properties,RpcClient rpcClient) {
         this.clientProxyFactory = clientProxyFactory;
         this.discoveryService = discoveryService;
         this.properties = properties;
+        this.rpcClient = rpcClient;
     }
 
     /**
@@ -73,7 +76,7 @@ public class RpcClientProcessor implements BeanFactoryPostProcessor, Application
                                         bean,//  字段所属的 bean 实例,要设置字段的目标对象（静态字段为 null）
                                         // 创建代理对象，并设置到字段中
                                         clientProxyFactory
-                                                .getProxy(field.getType(), rpcAutowired.version(), discoveryService, properties));
+                                                .getProxy(field.getType(), rpcAutowired.version(), discoveryService, properties,rpcClient));
                     }
                 });
                 System.err.println(beanClassName + " 类被代理了");

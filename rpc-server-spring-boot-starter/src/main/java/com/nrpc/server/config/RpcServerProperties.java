@@ -20,10 +20,14 @@ public class RpcServerProperties {
      *  服务名称
      */
     private String appName;
+    /**
+     *  服务器类型
+     */
+    private String transport ;
 
     /**
      *  注册中心地址
      */
-    private String registryAddr = "127.0.0.1:2181";
+    private String registryAddr;
 
 }

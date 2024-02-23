@@ -26,6 +26,10 @@ public class RpcClientProperties {
      *  服务发现地址
      */
     private String discoveryAddr = "192.168.150.101:2181";
+    /**
+     * 运输方式
+     */
+    private String transport;
 
     /**
      *  服务调用超时

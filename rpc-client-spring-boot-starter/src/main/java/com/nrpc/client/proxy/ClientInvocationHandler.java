@@ -2,6 +2,7 @@ package com.nrpc.client.proxy;
 
 import com.nrpc.client.config.RpcClientProperties;
 import com.nrpc.client.transport.RequestMetadata;
+import com.nrpc.client.transport.RpcClient;
 import com.nrpc.client.transport.RpcClientFactory;
 import com.nrpc.common.RpcRequest;
 import com.nrpc.common.RpcResponse;
@@ -12,9 +13,7 @@ import com.nrpc.exception.RpcException;
 import com.nrpc.protocol.MessageHeader;
 import com.nrpc.protocol.MessageProtocol;
 import com.nrpc.protocol.MsgStatus;
-import com.nrpc.serialization.Serializer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -25,8 +24,10 @@ public class ClientInvocationHandler implements InvocationHandler {
     private Class<?> aClass;
 
     private String version;
+    private RpcClient rpcClient;
 
-    public ClientInvocationHandler(DiscoveryService discoveryService, RpcClientProperties properties, Class<?> aClass, String version) {
+    public ClientInvocationHandler(RpcClient rpcClient, DiscoveryService discoveryService, RpcClientProperties properties, Class<?> aClass, String version) {
+        this.rpcClient = rpcClient;
         this.discoveryService = discoveryService;
         this.properties = properties;
         this.aClass = aClass;
@@ -61,7 +62,7 @@ public class ClientInvocationHandler implements InvocationHandler {
                 .protocol(messageProtocol).address(serviceInfo.getAddress())
                 .port(serviceInfo.getPort()).timeout(properties.getTimeout()).build();
         // 发送网络请求
-        MessageProtocol<RpcResponse> responseMessageProtocol = RpcClientFactory.getRpcClient().sendRequest(metadata);
+        MessageProtocol<RpcResponse> responseMessageProtocol = rpcClient.sendRequest(metadata);
         if (responseMessageProtocol == null) {
             log.error("请求超时");
             throw new RpcException("rpc调用结果失败， 请求超时 timeout:" + properties.getTimeout());

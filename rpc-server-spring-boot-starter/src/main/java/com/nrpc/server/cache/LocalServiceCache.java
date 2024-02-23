@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 服务器本地缓存，服务名和对应的实现类
+ */
 public class LocalServiceCache {
     private static final Map<String, Object> serverCacheMap = new ConcurrentHashMap<>();
 

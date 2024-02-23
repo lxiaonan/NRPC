@@ -1,7 +1,10 @@
-package com.nrpc.client.transport;
+package com.nrpc.client.transport.netty;
 
 import com.nrpc.client.cache.LocalRpcResponseCache;
 import com.nrpc.client.handler.RpcResponseHandler;
+import com.nrpc.client.transport.RequestMetadata;
+import com.nrpc.client.transport.RpcClient;
+import com.nrpc.client.transport.RpcFuture;
 import com.nrpc.codec.MyMessageCodecSharable;
 import com.nrpc.codec.RpcDecoder;
 import com.nrpc.codec.RpcEncoder;
@@ -31,7 +34,6 @@ public class NettyRpcClient implements RpcClient {
     public NettyRpcClient() {
         group = new NioEventLoopGroup(4);
         MyMessageCodecSharable<Object> CODEC_SHARABLE = new MyMessageCodecSharable<>();
-        RpcResponseHandler RPC_RESPONSE_HANDLER = new RpcResponseHandler();
         bootstrap = new Bootstrap()
                 .group(group)
                 .channel(NioSocketChannel.class)
@@ -57,7 +59,7 @@ public class NettyRpcClient implements RpcClient {
 //                        pipeline.addLast(new RpcEncoder<>());
 //                        // 协议解码
 //                        pipeline.addLast(new RpcDecoder());
-                        pipeline.addLast(RPC_RESPONSE_HANDLER);
+                        pipeline.addLast(new RpcResponseHandler());
                     }
                 });
     }

@@ -5,6 +5,9 @@ import com.nrpc.balancer.RandomLoadBalance;
 import com.nrpc.balancer.RoundRobinLoadBalancer;
 import com.nrpc.client.processor.RpcClientProcessor;
 import com.nrpc.client.proxy.ClientProxyFactory;
+import com.nrpc.client.transport.RpcClient;
+import com.nrpc.client.transport.netty.NettyRpcClient;
+import com.nrpc.client.transport.socket.SocketRpcClient;
 import com.nrpc.discovery.DiscoveryService;
 import com.nrpc.discovery.ZooKeeperDiscoveryServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,7 @@ public class RpcClientAutoConfiguration {
 
     /**
      * 代理工厂
+     *
      * @return 代理类
      */
     @Bean
@@ -38,7 +42,6 @@ public class RpcClientAutoConfiguration {
     }
 
     /**
-     *
      * @return 随机
      */
     @Primary // 如果存在多个bean优先选择这个
@@ -50,7 +53,6 @@ public class RpcClientAutoConfiguration {
     }
 
     /**
-     *
      * @return 轮询
      */
     @Bean(name = "loadBalance")
@@ -62,6 +64,7 @@ public class RpcClientAutoConfiguration {
 
     /**
      * 服务发现
+     *
      * @param properties
      * @param loadBalance
      * @return
@@ -76,6 +79,24 @@ public class RpcClientAutoConfiguration {
     }
 
     /**
+     * rpc的Netty客户端
+     * @return
+     */
+    @Primary
+    @Bean("rpcClient")
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "nrpc.client", name = "transport", havingValue = "netty")
+    public RpcClient nettyRpcClient(){
+        return new NettyRpcClient();
+    }
+    @Primary
+    @Bean("rpcClient")
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "nrpc.client", name = "transport", havingValue = "socket")
+    public RpcClient socketRpcClient(){
+        return new SocketRpcClient();
+    }
+    /**
      * 客户端处理器
      * @param clientProxyFactory 代理工厂
      * @param discoveryService 服务发现
@@ -86,7 +107,8 @@ public class RpcClientAutoConfiguration {
     @ConditionalOnMissingBean
     public RpcClientProcessor rpcClientProcessor(@Autowired ClientProxyFactory clientProxyFactory,
                                                  @Autowired DiscoveryService discoveryService,
-                                                 @Autowired RpcClientProperties properties){
-        return new RpcClientProcessor(clientProxyFactory,discoveryService,properties);
+                                                 @Autowired RpcClientProperties properties,
+                                                 @Autowired RpcClient rpcClient) {
+        return new RpcClientProcessor(clientProxyFactory, discoveryService, properties, rpcClient);
     }
 }

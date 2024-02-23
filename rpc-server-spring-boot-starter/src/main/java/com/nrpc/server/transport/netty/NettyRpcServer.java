@@ -1,10 +1,11 @@
-package com.nrpc.server.transport;
+package com.nrpc.server.transport.netty;
 
 import com.nrpc.codec.MyMessageCodecSharable;
 import com.nrpc.codec.RpcDecoder;
 import com.nrpc.codec.RpcEncoder;
 import com.nrpc.protocol.ProtocolFrameDecoder;
 import com.nrpc.server.handler.RpcRequestHandler;
+import com.nrpc.server.transport.RpcServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -28,7 +29,7 @@ public class NettyRpcServer implements RpcServer {
         NioEventLoopGroup work = new NioEventLoopGroup();
         NioEventLoopGroup boos = new NioEventLoopGroup();
         MyMessageCodecSharable<Object> CODEC_SHARABLE = new MyMessageCodecSharable<>();
-        RpcRequestHandler RPC_REQUEST_HANDLER = new RpcRequestHandler();
+        NettyRpcRequestHandler RPC_REQUEST_HANDLER = new NettyRpcRequestHandler();
         try {
             // 获得本机ip
             String serverAddress = InetAddress.getLocalHost().getHostAddress();
